@@ -23,6 +23,7 @@ import (
 	"github.com/kabukky/journey/structure/methods"
 	"github.com/kabukky/journey/templates"
 	"github.com/satori/go.uuid"
+	"github.com/teris-io/shortid"
 )
 
 type JsonPost struct {
@@ -257,7 +258,8 @@ func postApiPostHandler(w http.ResponseWriter, r *http.Request, _ map[string]str
 		if json.Slug != "" { // Ceck if user has submitted a custom slug
 			postSlug = slug.Generate(json.Slug, "posts")
 		} else {
-			postSlug = slug.Generate(json.Title, "posts")
+			//postSlug = slug.Generate(json.Title, "posts")
+			postSlug = slug.Generate(shortid.MustGenerate(), "posts")
 		}
 		currentTime := date.GetCurrentTime()
 		post := structure.Post{Title: []byte(json.Title), Slug: postSlug, Markdown: []byte(json.Markdown), Html: conversion.GenerateHtmlFromMarkdown([]byte(json.Markdown)), IsFeatured: json.IsFeatured, IsPage: json.IsPage, IsPublished: json.IsPublished, MetaDescription: []byte(json.MetaDescription), Image: []byte(json.Image), Date: &currentTime, Tags: methods.GenerateTagsFromCommaString(json.Tags), Author: &structure.User{Id: userId}}
