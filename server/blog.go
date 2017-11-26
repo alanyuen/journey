@@ -16,6 +16,17 @@ import (
 
 func indexHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	number := params["number"]
+	
+	/*if number == "/favicon.ico" {
+		staticHandler(w, r, params)
+		return
+	}
+	
+	if number == "/robots.txt" {
+		staticHandler(w, r, params)
+		return
+	}*/
+	
 	if number == "" {
 		// Render index template (first page)
 		err := templates.ShowIndexTemplate(w, r, 1)
@@ -171,6 +182,7 @@ func publicHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 
 func staticHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	filePath := filepath.Join(filenames.StaticFilepath, r.URL.Path)
+	fmt.Println(filePath)
 	if _, err := os.Stat(filePath); err == nil {
 		http.ServeFile(w, r, filePath)
 	} else {
@@ -180,6 +192,8 @@ func staticHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 }
  
 func InitializeBlog(router *httptreemux.TreeMux) {
+	router.RemoveCatchAllTrailingSlash = true
+	
 	// For index
 	router.GET("/", indexHandler)
 	router.GET("/:slug/edit", postEditHandler)
