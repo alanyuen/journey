@@ -82,7 +82,7 @@ func createFeed(values *structure.RequestData) *feeds.Feed {
 			// Make link
 			var buffer bytes.Buffer
 			buffer.Write(values.Blog.Url)
-			buffer.WriteString("/")
+			buffer.WriteString("/post/")
 			buffer.WriteString(values.Posts[i].Slug)
 			item := &feeds.Item{
 				Title:       string(values.Posts[i].Title),

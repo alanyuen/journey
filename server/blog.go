@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 
@@ -115,14 +114,6 @@ func postHandler(w http.ResponseWriter, r *http.Request, params map[string]strin
 	if slug == "" {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
-	} else if slug == "rss" {
-		// Render index rss feed
-		err := templates.ShowIndexRss(w)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		return
 	}
 
 	// Render post template
@@ -171,21 +162,32 @@ func publicHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 }
 
 func staticHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	filePath := filepath.Join(filenames.StaticFilepath, r.URL.Path)
-	fmt.Println(filePath)
-	if _, err := os.Stat(filePath); err == nil {
-		http.ServeFile(w, r, filePath)
-	} else {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	slug := params["slug"]
+
+	if slug == "" {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}else if slug == "rss" {
+		// Render index rss feed
+		err := templates.ShowIndexRss(w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		return
 	}
+	
+	
+	filePath := filepath.Join(filenames.StaticFilepath, slug)
+	http.ServeFile(w, r, filePath)
 	return
 }
  
 func InitializeBlog(router *httptreemux.TreeMux) {
 	// For index
 	router.GET("/", indexHandler)
-	router.GET("/:slug/edit", postEditHandler)
-	router.GET("/:slug/", postHandler)
+	router.GET("/post/:slug/edit", postEditHandler)
+	router.GET("/post/:slug/", postHandler)
 	router.GET("/page/:number/", indexHandler)
 	// For author
 	router.GET("/author/:slug/", authorHandler)
@@ -201,6 +203,5 @@ func InitializeBlog(router *httptreemux.TreeMux) {
 	router.GET("/content/images/*filepath", imagesHandler) // This is here to keep compatibility with Ghost
 	router.GET("/public/*filepath", publicHandler)
 	// For static files
-	router.GET("/favicon.ico", staticHandler)
-	router.GET("/robots.txt", staticHandler)
+	router.GET("/:slug", staticHandler)
 }

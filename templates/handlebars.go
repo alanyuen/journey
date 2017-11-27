@@ -588,7 +588,7 @@ func urlFunc(helper *structure.Helper, values *structure.RequestData) []byte {
 		}
 	}
 	if values.CurrentHelperContext == 1 { // post
-		buffer.WriteString("/")
+		buffer.WriteString("/post/")
 		buffer.WriteString(values.Posts[values.CurrentPostIndex].Slug)
 		buffer.WriteString("/")
 		return evaluateEscape(buffer.Bytes(), helper.Unescaped)
