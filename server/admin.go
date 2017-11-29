@@ -302,7 +302,11 @@ func patchApiPostHandler(w http.ResponseWriter, r *http.Request, _ map[string]st
 			return
 		}
 		if json.Slug != post.Slug { // Check if user has submitted a custom slug
-			postSlug = slug.Generate(json.Slug, "posts")
+			if json.Slug != "" {
+				postSlug = slug.Generate(json.Slug, "posts")
+			}else {
+				postSlug = slug.Generate(shortid.MustGenerate(), "posts")
+			}
 		} else {
 			postSlug = post.Slug
 		}
